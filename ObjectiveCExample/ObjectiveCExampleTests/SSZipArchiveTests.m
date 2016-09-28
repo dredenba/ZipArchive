@@ -257,6 +257,26 @@
     XCTAssertTrue(unicodeFolderWasExtracted, @"Folders with names in unicode should be extracted propertly.");
 }
 
+-(void) testUnzippingWithSubdirectories
+{
+    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject]
+                      stringByAppendingPathComponent:@"com.samsoffes.ssziparchive.tests"];
+    NSString* outputPath = [path stringByAppendingPathComponent:@"subdirectories"];
+
+    NSString* zipPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"subdirectories" ofType:@"zip"];
+    
+    BOOL theUnzipResult = [SSZipArchive unzipFileAtPath:zipPath toDestination:outputPath delegate: nil ];
+    
+    bool topLevelFileWasExtracted = [[NSFileManager defaultManager] fileExistsAtPath:[outputPath stringByAppendingPathComponent:@"abc.txt"]];
+    XCTAssertTrue(topLevelFileWasExtracted, @"Files with filenames in subdirectories should be extracted properly.");
+
+    bool firstSubdirectoryLevelFileWasExtracted = [[NSFileManager defaultManager] fileExistsAtPath:[outputPath stringByAppendingPathComponent:@"greetings/hellos/hi.txt"]];
+    XCTAssertTrue(firstSubdirectoryLevelFileWasExtracted, @"Files with filenames in subdirectories should be extracted properly.");
+    
+    bool secondSubdirectoryLevelFileWasExtracted = [[NSFileManager defaultManager] fileExistsAtPath:[outputPath stringByAppendingPathComponent:@"greetings/goodbyes/farewell.txt"]];
+    XCTAssertTrue(secondSubdirectoryLevelFileWasExtracted, @"Files with filenames in subdirectories should be extracted properly.");
+    XCTAssertTrue( theUnzipResult, @"unzip subdirectories.zip should succeed" );
+}
 
 - (void)testZippingAndUnzippingForDate {
 
